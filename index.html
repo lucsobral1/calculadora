@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora do Mundo Mágico - Harry Potter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cinzel', 'Georgia', serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1f2a 50%, #2a2f3a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Estrelas cadentes mágicas */
+        .magic-stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: gold;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); box-shadow: 0 0 20px gold; }
+        }
+
+        .star1 { top: 10%; left: 20%; animation-delay: 0s; }
+        .star2 { top: 30%; left: 80%; animation-delay: 1s; }
+        .star3 { top: 60%; left: 40%; animation-delay: 2s; }
+        .star4 { top: 80%; left: 10%; animation-delay: 3s; }
+        .star5 { top: 20%; left: 90%; animation-delay: 4s; }
+
+        /* Varinhas mágicas decorativas */
+        .wand {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,10 L55,90 L45,90 L50,10" fill="%238b4513" opacity="0.2"/><circle cx="50" cy="10" r="5" fill="%23ffd700" opacity="0.2"/></svg>') center/contain no-repeat;
+            animation: floatWand 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .wand1 { top: 5%; left: 5%; animation-delay: 0s; }
+        .wand2 { bottom: 5%; right: 5%; animation-delay: 2s; }
+
+        @keyframes floatWand {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .calculator {
+            background: rgba(26, 20, 30, 0.95);
+            border-radius: 60px 60px 30px 30px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 
+                        0 0 0 5px #740001,
+                        0 0 30px #ae0001;
+            padding: 30px;
+            width: 100%;
+            max-width: 550px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(174, 0, 1, 0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+            margin: 20px;
+        }
+
+        /* Efeito da carta de Hogwarts */
+        .hogwarts-letter {
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(238, 210, 154, 0.1);
+            transform: rotate(15deg);
+            border-radius: 20px;
+            border: 2px solid #740001;
+            pointer-events: none;
+        }
+
+        .hogwarts-letter::before {
+            content: 'H';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            color: rgba(174, 0, 1, 0.3);
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Header de Hogwarts */
+        .hogwarts-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 60px;
+            border: 3px solid #ae0001;
+            position: relative;
+            box-shadow: 0 0 30px rgba(174, 0, 1, 0.3);
+        }
+
+        .house-crest {
+            width: 60px;
+            height: 60px;
+            background: #740001;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #d3a625;
+            border: 3px solid #d3a625;
+            box-shadow: 0 0 30px #d3a625;
+            font-weight: bold;
+        }
+
+        .hogwarts-title {
+            text-align: center;
+            color: #d3a625;
+            text-shadow: 2px 2px 4px #740001;
+        }
+
+        .hogwarts-title h2 {
+            font-size: 24px;
+            letter-spacing: 4px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .hogwarts-title p {
+            color: #ae0001;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .sorting-hat {
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            font-size: 30px;
+            animation: hatWiggle 3s ease-in-out infinite;
+            transform-origin: top center;
+        }
+
+        @keyframes hatWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        .mode-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 50px;
+            border: 2px solid #ae0001;
+            position: relative;
+        }
+
+        .mode-toggle span {
+            color: #d3a625;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .mode-toggle div {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-toggle button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: transparent;
+            color: #d3a625;
+            border: 1px solid #ae0001;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .mode-toggle button.active {
+            background: linear-gradient(135deg, #740001, #ae0001);
+            color: #d3a625;
+            border-color: #d3a625;
+            box-shadow: 0 0 30px #d3a625;
+        }
+
+        .display {
+            background: rgba(20, 15, 25, 0.95);
+            border-radius: 20px 20px 20px 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: right;
+            box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.5), 0 5px 0 #0a0f1a;
+            border: 3px solid #ae0001;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Efeito de pergaminho */
+        .display::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 1px dashed #d3a625;
+            border-radius: 15px;
+            pointer-events: none;
+        }
+
+        .history {
+            font-size: 14px;
+            color: #d3a625;
+            min-height: 20px;
+            margin-bottom: 5px;
+            word-wrap: break-word;
+            font-family: 'Cinzel', serif;
+        }
+
+        .current {
+            font-size: 42px;
+            font-weight: 800;
+            color: #fff;
+            word-wrap: break-word;
+            text-shadow: 0 0 15px #d3a625;
+            font-family: 'Cinzel', serif;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .scientific-buttons {
+            display: none;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .scientific-buttons.show {
+            display: grid;
+        }
+
+        button {
+            padding: 18px 5px;
+            border: none;
+            border-radius: 18px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(30, 25, 35, 0.95);
+            color: #d3a625;
+            border: 2px solid #740001;
+            box-shadow: 0 4px 0 #0a0f1a, 0 8px 15px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Brasões das casas nos botões */
+        button[data-house="gryffindor"]::after {
+            content: '🦁';
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            font-size: 14px;
+            color: #ae0001;
+            opacity: 0.7;
+        }
+
+        button[data-house="slytherin"]::after {
+            content: '🐍';
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            font-size: 14px;
+            color: #2a6230;
+            opacity: 0.7;
+        }
+
+        button[data-house="ravenclaw"]::after {
+            content: '🦅';
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            font-size: 14px;
+            color: #0e1a40;
+            opacity: 0.7;
+        }
+
+        button[data-house="hufflepuff"]::after {
+            content: '🦡';
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            font-size: 14px;
+            color: #ecb939;
+            opacity: 0.7;
+        }
+
+        /* Efeito mágico nos botões */
+        button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(211, 166, 37, 0.3), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        button:hover::before {
+            opacity: 1;
+            animation: magicSparkle 1s linear infinite;
+        }
+
+        @keyframes magicSparkle {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 0 #0a0f1a, 0 12px 20px rgba(0, 0, 0, 0.5);
+            border-color: #d3a625;
+            color: #fff;
+        }
+
+        .operator {
+            background: linear-gradient(135deg, #2a1f2a, #1a0f1a);
+            color: #d3a625;
+            border-color: #740001;
+        }
+
+        .equals {
+            background: linear-gradient(135deg, #740001, #ae0001);
+            color: #d3a625;
+            grid-column: span 2;
+            border: 2px solid #d3a625;
+            font-weight: 800;
+            font-size: 24px;
+        }
+
+        .clear {
+            background: linear-gradient(135deg, #2a1a1a, #1a0a0a);
+            color: #d3a625;
+            border-color: #740001;
+        }
+
+        .function {
+            background: rgba(20, 15, 25, 0.95);
+            color: #d3a625;
+            border-color: #2a6230;
+        }
+
+        /* Mensagem da Ordem da Fênix */
+        .phoenix-message {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #d3a625;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            border: 3px solid #ae0001;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-family: 'Cinzel', serif;
+            font-style: italic;
+            z-index: 20;
+            box-shadow: 0 0 30px #d3a625;
+        }
+
+        .calculator:hover .phoenix-message {
+            opacity: 1;
+            animation: phoenixGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes phoenixGlow {
+            0%, 100% { box-shadow: 0 0 20px #d3a625; }
+            50% { box-shadow: 0 0 40px #ae0001; }
+        }
+
+        /* Elementos mágicos flutuantes */
+        .magic-element {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.2;
+            animation: float 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .element1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .element2 { bottom: 15%; right: 8%; animation-delay: 1s; }
+        .element3 { top: 30%; right: 10%; animation-delay: 2s; }
+        .element4 { bottom: 25%; left: 10%; animation-delay: 3s; }
+
+        /* Chave de fogo */
+        .firebolt {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 20px;
+            opacity: 0.3;
+            transform: rotate(-15deg);
+        }
+
+        @media (max-width: 768px) {
+            .calculator {
+                padding: 20px;
+            }
+            
+            button {
+                padding: 15px 5px;
+                font-size: 18px;
+            }
+            
+            .hogwarts-title h2 {
+                font-size: 18px;
+            }
+            
+            .phoenix-message {
+                font-size: 12px;
+                white-space: normal;
+                width: 90%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Estrelas mágicas -->
+    <div class="magic-stars">
+        <div class="star star1"></div>
+        <div class="star star2"></div>
+        <div class="star star3"></div>
+        <div class="star star4"></div>
+        <div class="star star5"></div>
+    </div>
+    
+    <!-- Varinhas mágicas -->
+    <div class="wand wand1"></div>
+    <div class="wand wand2"></div>
+    
+    <!-- Elementos mágicos -->
+    <div class="magic-element element1">⚡</div>
+    <div class="magic-element element2">🦉</div>
+    <div class="magic-element element3">🧙</div>
+    <div class="magic-element element4">🐉</div>
+
+    <div class="calculator">
+        <!-- Carta de Hogwarts -->
+        <div class="hogwarts-letter"></div>
+        
+        <!-- Header de Hogwarts -->
+        <div class="hogwarts-header">
+            <div class="house-crest">H</div>
+            <div class="hogwarts-title">
+                <h2>HOGWARTS</h2>
+                <p>Escola de Magia e Bruxaria</p>
+            </div>
+            <div class="house-crest">W</div>
+            <div class="sorting-hat">🧙</div>
+        </div>
+
+        <div class="mode-toggle">
+            <span>⚡ MAGIA ⚡</span>
+            <div>
+                <button id="simpleMode" class="active">Trouxa</button>
+                <button id="scientificMode">Bruxo</button>
+            </div>
+        </div>
+
+        <div class="display">
+            <div class="history" id="history">⚡ Expecto Patronum ⚡</div>
+            <div class="current" id="display">0</div>
+        </div>
+
+        <!-- Mensagem da Fênix -->
+        <div class="phoenix-message" id="phoenixMessage">"Feliz aniversário, Harry!" - Hagrid</div>
+
+        <div class="buttons" id="simpleButtons">
+            <button class="clear" onclick="clearDisplay()" data-house="gryffindor">C</button>
+            <button class="clear" onclick="deleteLast()" data-house="slytherin">⌫</button>
+            <button class="operator" onclick="appendOperator('%')" data-house="ravenclaw">%</button>
+            <button class="operator" onclick="appendOperator('/')" data-house="hufflepuff">÷</button>
+            
+            <button onclick="appendNumber('7')" data-house="gryffindor">7</button>
+            <button onclick="appendNumber('8')" data-house="slytherin">8</button>
+            <button onclick="appendNumber('9')" data-house="ravenclaw">9</button>
+            <button class="operator" onclick="appendOperator('*')" data-house="hufflepuff">×</button>
+            
+            <button onclick="appendNumber('4')" data-house="gryffindor">4</button>
+            <button onclick="appendNumber('5')" data-house="slytherin">5</button>
+            <button onclick="appendNumber('6')" data-house="ravenclaw">6</button>
+            <button class="operator" onclick="appendOperator('-')" data-house="hufflepuff">−</button>
+            
+            <button onclick="appendNumber('1')" data-house="gryffindor">1</button>
+            <button onclick="appendNumber('2')" data-house="slytherin">2</button>
+            <button onclick="appendNumber('3')" data-house="ravenclaw">3</button>
+            <button class="operator" onclick="appendOperator('+')" data-house="hufflepuff">+</button>
+            
+            <button onclick="appendNumber('0')" data-house="gryffindor">0</button>
+            <button onclick="appendDot()" data-house="ravenclaw">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+
+        <div class="scientific-buttons" id="scientificButtons">
+            <button class="function" onclick="appendFunction('sin(')" data-house="ravenclaw">sin</button>
+            <button class="function" onclick="appendFunction('cos(')" data-house="ravenclaw">cos</button>
+            <button class="function" onclick="appendFunction('tan(')" data-house="ravenclaw">tan</button>
+            <button class="function" onclick="appendFunction('π')" data-house="gryffindor">π</button>
+            
+            <button class="function" onclick="appendFunction('!')" data-house="slytherin">n!</button>
+            <button class="function" onclick="appendFunction('√(')" data-house="hufflepuff">√</button>
+            <button class="function" onclick="appendFunction('^')" data-house="ravenclaw">x^y</button>
+            <button class="function" onclick="appendNumber('(')" data-house="gryffindor">(</button>
+            
+            <button class="function" onclick="appendNumber(')')" data-house="slytherin">)</button>
+            <button class="function" onclick="appendNumber('e')" data-house="hufflepuff">e</button>
+            <button class="function" onclick="appendFunction('log(')" data-house="ravenclaw">log</button>
+            <button class="function" onclick="appendFunction('ln(')" data-house="gryffindor">ln</button>
+        </div>
+
+        <div class="firebolt">🧹</div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let history = document.getElementById('history');
+        let currentInput = '0';
+        let lastResult = null;
+        let shouldResetDisplay = false;
+
+        // Elementos do modo
+        const simpleModeBtn = document.getElementById('simpleMode');
+        const scientificModeBtn = document.getElementById('scientificMode');
+        const simpleButtons = document.getElementById('simpleButtons');
+        const scientificButtons = document.getElementById('scientificButtons');
+        const phoenixMessage = document.getElementById('phoenixMessage');
+
+        // Mensagens mágicas
+        const magicMessages = [
+            '"Feliz aniversário, Harry!" - Hagrid',
+            '"Você é um bruxo, Harry!" - Hagrid',
+            '"Não vale matar!" - Dumbledore',
+            '"Vire à esquerda!" - Snape',
+            '"Wingardium Leviosa!" - Hermione',
+            '"Expecto Patronum!" - Lupin',
+            '"Sempre alerta!" - Olho-Tonto Moody',
+            '"Mischief managed!" - Sirius Black',
+            '"Até a vitória final!" - Dumbledore',
+            '"Sonserina vence a taça!" - Salazar Slytherin'
+        ];
+
+        function changeMagicMessage() {
+            const randomMessage = magicMessages[Math.floor(Math.random() * magicMessages.length)];
+            phoenixMessage.textContent = randomMessage;
+        }
+
+        // Mudar mensagem a cada 5 segundos
+        setInterval(changeMagicMessage, 5000);
+
+        // Funções de modo
+        simpleModeBtn.addEventListener('click', () => {
+            simpleModeBtn.classList.add('active');
+            scientificModeBtn.classList.remove('active');
+            simpleButtons.style.display = 'grid';
+            scientificButtons.classList.remove('show');
+        });
+
+        scientificModeBtn.addEventListener('click', () => {
+            scientificModeBtn.classList.add('active');
+            simpleModeBtn.classList.remove('active');
+            simpleButtons.style.display = 'grid';
+            scientificButtons.classList.add('show');
+        });
+
+        // Funções da calculadora
+        function updateDisplay() {
+            display.textContent = currentInput;
+        }
+
+        function appendNumber(number) {
+            if (shouldResetDisplay) {
+                currentInput = number;
+                shouldResetDisplay = false;
+            } else if (currentInput === '0') {
+                currentInput = number;
+            } else {
+                currentInput += number;
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(operator) {
+            if (shouldResetDisplay) {
+                shouldResetDisplay = false;
+            }
+            
+            const lastChar = currentInput[currentInput.length - 1];
+            if (['+', '-', '*', '/', '%', '^'].includes(lastChar)) {
+                currentInput = currentInput.slice(0, -1) + operator;
+            } else {
+                currentInput += operator;
+            }
+            updateDisplay();
+        }
+
+        function appendDot() {
+            const lastNumber = currentInput.split(/[\+\-\*\/\^\%]/).pop();
+            if (!lastNumber.includes('.')) {
+                currentInput += '.';
+                updateDisplay();
+            }
+        }
+
+        function appendFunction(func) {
+            if (func === 'π') {
+                currentInput += Math.PI;
+            } else if (func === 'e') {
+                currentInput += Math.E;
+            } else {
+                if (shouldResetDisplay) {
+                    currentInput = func;
+                    shouldResetDisplay = false;
+                } else {
+                    currentInput += func;
+                }
+            }
+            updateDisplay();
+            changeMagicMessage();
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            history.textContent = '⚡ Expecto Patronum ⚡';
+            updateDisplay();
+            changeMagicMessage();
+        }
+
+        function deleteLast() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        function factorial(n) {
+            if (n === 0 || n === 1) return 1;
+            return n * factorial(n - 1);
+        }
+
+        function calculate() {
+            try {
+                let expression = currentInput;
+                
+                // Substituir símbolos
+                expression = expression.replace(/×/g, '*');
+                expression = expression.replace(/÷/g, '/');
+                expression = expression.replace(/\^/g, '**');
+                
+                // Processar funções especiais
+                expression = expression.replace(/sin\(/g, 'Math.sin(');
+                expression = expression.replace(/cos\(/g, 'Math.cos(');
+                expression = expression.replace(/tan\(/g, 'Math.tan(');
+                expression = expression.replace(/√\(/g, 'Math.sqrt(');
+                expression = expression.replace(/log\(/g, 'Math.log10(');
+                expression = expression.replace(/ln\(/g, 'Math.log(');
+                
+                // Processar fatorial
+                if (expression.includes('!')) {
+                    const parts = expression.split('!');
+                    let result = '';
+                    for (let i = 0; i < parts.length - 1; i++) {
+                        const part = parts[i];
+                        const match = part.match(/(\d+)$/);
+                        if (match) {
+                            const num = parseInt(match[1]);
+                            const fact = factorial(num);
+                            result += part.slice(0, -match[1].length) + fact;
+                        } else {
+                            result += part;
+                        }
+                    }
+                    result += parts[parts.length - 1];
+                    expression = result;
+                }
+                
+                // Avaliar a expressão
+                const result = eval(expression);
+                
+                history.textContent = currentInput + ' =';
+                currentInput = result.toString();
+                lastResult = result;
+                shouldResetDisplay = true;
+                updateDisplay();
+                
+                // Easter eggs mágicos
+                if (result === 1991) {
+                    phoenixMessage.textContent = '"O ano em que Harry chegou a Hogwarts!"';
+                } else if (result === 7) {
+                    phoenixMessage.textContent = '"7 Horcruxes, 7 livros, 7 jogadores!"';
+                } else if (result === 9.75) {
+                    phoenixMessage.textContent = '"Plataforma 9 3/4!"';
+                } else if (result === 42) {
+                    phoenixMessage.textContent = '"A resposta para a vida, o universo e tudo mais!"';
+                } else {
+                    changeMagicMessage();
+                }
+                
+            } catch (error) {
+                history.textContent = 'Feitiço falhou!';
+                currentInput = '0';
+                updateDisplay();
+                phoenixMessage.textContent = '"Reparo!" - Feitiço de reparo necessário';
+            }
+        }
+
+        // Teclado
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9') {
+                appendNumber(key);
+            } else if (key === '.') {
+                appendDot();
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                appendOperator(key);
+            } else if (key === '%') {
+                appendOperator('%');
+            } else if (key === '=' || key === 'Enter') {
+                calculate();
+            } else if (key === 'Escape') {
+                clearDisplay();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            }
+        });
+
+        // Inicialização
+        updateDisplay();
+    </script>
+</body>
+</html>
